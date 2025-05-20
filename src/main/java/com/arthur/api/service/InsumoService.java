@@ -6,6 +6,7 @@ import com.arthur.api.repository.InsumoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -42,6 +43,12 @@ public class InsumoService {
         insumo.setCustoUn(requestDto.getCustoUn());
 
         return insumoRepository.save(insumo);
+    }
+
+    public BigDecimal custoInsumo(Long id, BigDecimal quantidade){
+        Insumo insumo = findById(id);
+
+        return insumo.getCustoUn().multiply(quantidade);
     }
 
 }

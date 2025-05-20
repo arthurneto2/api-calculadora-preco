@@ -27,7 +27,6 @@ public class Produto {
     @ManyToOne
     private Usuario usuario;
 
-
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Insumo> insumo;
 

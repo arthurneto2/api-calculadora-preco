@@ -1,6 +1,7 @@
 package com.arthur.api.controller;
 
 
+import com.arthur.api.domain.Insumo;
 import com.arthur.api.domain.Produto;
 import com.arthur.api.domain.Usuario;
 import com.arthur.api.dto.ProductDto;
@@ -11,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,6 +54,22 @@ public class ProdutoController {
         Produto produto = productService.update(request);
         ProductDto response = new ProductDto(produto);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/ingredientes")
+    public ResponseEntity<Void> adicionarIngrediente(
+            @PathVariable Long id,
+            @RequestBody Set<Insumo> insumos
+    ) {
+        productService.relacionarIngredientes(id, insumos);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).build();
+    }
+
+
+    @GetMapping("/{id}/calcular-preco")
+    public ResponseEntity<ProductDto> calcularPreco(@PathVariable Long id, BigDecimal quantidade) {
+        ProductDto response = productService.calcularPreco(id, quantidade);
         return ResponseEntity.ok(response);
     }
 
