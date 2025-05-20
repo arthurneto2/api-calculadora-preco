@@ -64,8 +64,7 @@ public class ProductService {
 
     }
 
-    public BigDecimal calculaCustoTotal(Long id, BigDecimal quantidade) {
-        Produto produto = findById(id);
+    public BigDecimal calculaCustoTotal(Produto produto, BigDecimal quantidade) {
         BigDecimal custoTotal = BigDecimal.ZERO;
         for (Insumo i : produto.getInsumo()) {
             custoTotal = custoTotal.add(i.getCustoUn().multiply(quantidade));
@@ -78,8 +77,7 @@ public class ProductService {
         return custoTotal;
     }
 
-    public BigDecimal calculaPrecoVenda(Long id) {
-        Produto produto = findById(id);
+    public BigDecimal calculaPrecoVenda(Produto produto) {
         BigDecimal precoVenda = BigDecimal.ZERO;
 
         precoVenda = precoVenda.add(produto.getMargemDeLucro().multiply(produto.getCustoTotal()));
@@ -89,8 +87,8 @@ public class ProductService {
     public ProductDto calcularPreco(Long id, BigDecimal quantidade) {
         Produto produto = findById(id);
 
-        produto.setCustoTotal(calculaCustoTotal(id, quantidade));
-        produto.setPrecoVenda(calculaPrecoVenda(id));
+        produto.setCustoTotal(calculaCustoTotal(produto, quantidade));
+        produto.setPrecoVenda(calculaPrecoVenda(produto));
 
 
         produtoRepository.save(produto);
