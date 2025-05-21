@@ -1,8 +1,11 @@
 package com.arthur.api.service;
 
+import com.arthur.api.domain.ComponenteProduto;
 import com.arthur.api.domain.Insumo;
 import com.arthur.api.domain.Produto;
 import com.arthur.api.domain.Usuario;
+import com.arthur.api.dto.AdicionarIngredienteDto;
+import com.arthur.api.dto.ComponenteProdutoDto;
 import com.arthur.api.dto.ProductDto;
 import com.arthur.api.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +21,8 @@ public class ProductService {
 
 
     private final ProdutoRepository produtoRepository;
+
+    private final InsumoService insumoService;
 
 
     public Produto create(ProductDto productDto, Usuario usuario){
@@ -55,40 +60,37 @@ public class ProductService {
         return produtoRepository.save(produto);
     }
 
-    public void relacionarIngredientes(Long id, Set<Insumo> insumos) {
+    public void relacionarIngredientes(Long id, AdicionarIngredienteDto adicionarIngredienteDto) {
         Produto produto = findById(id);
+        Insumo insumo = insumoService.findById(adicionarIngredienteDto.getInsumoId());
 
-        produto.setInsumo(insumos);
+        ComponenteProduto componenteProduto = new ComponenteProduto();
+        componenteProduto.setQuantidade(adicionarIngredienteDto.getQuantidade());
+        componenteProduto.setInsumo(insumo);
+
+        produto.getComponenteProduto().add(componenteProduto);
         produtoRepository.save(produto);
 
 
     }
 
-    public BigDecimal calculaCustoTotal(Produto produto, BigDecimal quantidade) {
+    public BigDecimal calculaCustoTotal(Produto produto) {
         BigDecimal custoTotal = BigDecimal.ZERO;
-        for (Insumo i : produto.getInsumo()) {
-            custoTotal = custoTotal.add(i.getCustoUn().multiply(quantidade));
+        for (ComponenteProduto i : produto.getComponenteProduto()) {
+            custoTotal = custoTotal.add(i.getInsumo().getCustoUn().multiply(i.getQuantidade()));
             if (custoTotal.compareTo(BigDecimal.ZERO) < 0) {
                 custoTotal = BigDecimal.ZERO;
             }
-            produto.setCustoTotal(custoTotal);
-            produtoRepository.save(produto);
         }
         return custoTotal;
     }
 
-    public BigDecimal calculaPrecoVenda(Produto produto) {
-        BigDecimal precoVenda = BigDecimal.ZERO;
 
-        precoVenda = precoVenda.add(produto.getMargemDeLucro().multiply(produto.getCustoTotal()));
-
-        return precoVenda;
-    }
-    public ProductDto calcularPreco(Long id, BigDecimal quantidade) {
+    public ProductDto calcularPreco(Long id) {
         Produto produto = findById(id);
-
-        produto.setCustoTotal(calculaCustoTotal(produto, quantidade));
-        produto.setPrecoVenda(calculaPrecoVenda(produto));
+        BigDecimal custoTotal = calculaCustoTotal(produto);
+        produto.setCustoTotal(custoTotal);
+        produto.setPrecoVenda(produto.getMargemDeLucro().multiply(custoTotal));
 
 
         produtoRepository.save(produto);

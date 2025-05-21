@@ -40,7 +40,6 @@ public class UsuarioController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequestDto dto) {
 
-        // Verifica se o e-mail já está em uso
         if (usuarioRepository.findByEmail(dto.getEmail()).isPresent()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("E-mail já está em uso!");
         }

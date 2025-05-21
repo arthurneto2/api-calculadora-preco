@@ -24,9 +24,6 @@ public class Usuario implements UserDetails {
 
     private String password;
 
-    private BigDecimal margemPadrao;
-
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

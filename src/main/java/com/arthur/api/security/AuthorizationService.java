@@ -41,7 +41,6 @@ public class AuthorizationService implements UserDetailsService {
             admin.setName("Arthur");
             admin.setEmail("admin@labprog.com");
             admin.setPassword(PasswordEncoderService.encode("admin123"));
-            admin.setMargemPadrao(new BigDecimal("40"));
             usuarioRepository.save(admin);
         }
 

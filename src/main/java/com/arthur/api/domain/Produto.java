@@ -3,7 +3,6 @@ package com.arthur.api.domain;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.Fetch;
 
 import java.math.BigDecimal;
 import java.util.Set;
@@ -27,7 +26,7 @@ public class Produto {
     @ManyToOne
     private Usuario usuario;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    private Set<Insumo> insumo;
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    private Set<ComponenteProduto> componenteProduto;
 
 }

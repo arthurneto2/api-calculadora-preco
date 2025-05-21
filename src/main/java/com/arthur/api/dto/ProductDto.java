@@ -1,5 +1,6 @@
 package com.arthur.api.dto;
 
+import com.arthur.api.domain.ComponenteProduto;
 import com.arthur.api.domain.Insumo;
 import com.arthur.api.domain.Produto;
 import lombok.Data;
@@ -21,7 +22,7 @@ public class ProductDto {
 
     private BigDecimal margemDeLucro;
 
-    private Set<InsumoDto> insumoDtoSet;
+    private Set<ComponenteProdutoDto> componenteProdutoDtoSet;
 
     public ProductDto(Produto produto){
         id = produto.getId();
@@ -31,11 +32,11 @@ public class ProductDto {
         margemDeLucro = produto.getMargemDeLucro();
 
 
-        if(produto.getInsumo() != null){
-            insumoDtoSet = new HashSet<>();
-            for (Insumo i : produto.getInsumo()){
-                InsumoDto insumoDto = new InsumoDto(i);
-                insumoDtoSet.add(insumoDto);
+        if(produto.getComponenteProduto() != null){
+            componenteProdutoDtoSet = new HashSet<>();
+            for (ComponenteProduto i : produto.getComponenteProduto()){
+                ComponenteProdutoDto componenteProdutoDto = new ComponenteProdutoDto(i);
+                componenteProdutoDtoSet.add(componenteProdutoDto);
             }
         }
     }
