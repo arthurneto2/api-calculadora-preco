@@ -3,7 +3,7 @@ package com.arthur.api.controller;
 
 import com.arthur.api.domain.Produto;
 import com.arthur.api.domain.Usuario;
-import com.arthur.api.dto.AdicionarIngredienteDto;
+import com.arthur.api.dto.AdicionarInsumoDto;
 import com.arthur.api.dto.ProductDto;
 import com.arthur.api.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -55,12 +55,12 @@ public class ProdutoController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{id}/ingredientes")
-    public ResponseEntity<Void> adicionarIngrediente(
+    @PostMapping("/{id}/adicionar-insumos")
+    public ResponseEntity<Void> adicionarInsumos(
             @PathVariable Long idProduto,
-            @RequestBody AdicionarIngredienteDto adicionarIngredienteDto
+            @RequestBody AdicionarInsumoDto adicionarInsumoDto
     ) {
-        productService.relacionarIngredientes(idProduto, adicionarIngredienteDto);
+        productService.relacionarIngredientes(idProduto, adicionarInsumoDto);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 

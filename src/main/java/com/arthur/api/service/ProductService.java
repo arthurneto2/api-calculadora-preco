@@ -4,8 +4,7 @@ import com.arthur.api.domain.ComponenteProduto;
 import com.arthur.api.domain.Insumo;
 import com.arthur.api.domain.Produto;
 import com.arthur.api.domain.Usuario;
-import com.arthur.api.dto.AdicionarIngredienteDto;
-import com.arthur.api.dto.ComponenteProdutoDto;
+import com.arthur.api.dto.AdicionarInsumoDto;
 import com.arthur.api.dto.ProductDto;
 import com.arthur.api.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +58,7 @@ public class ProductService {
         return produtoRepository.save(produto);
     }
 
-    public void relacionarIngredientes(Long id, AdicionarIngredienteDto adicionarIngredienteDto) {
+    public void relacionarIngredientes(Long id, AdicionarInsumoDto adicionarIngredienteDto) {
         Produto produto = findById(id);
         Insumo insumo = insumoService.findById(adicionarIngredienteDto.getInsumoId());
 
