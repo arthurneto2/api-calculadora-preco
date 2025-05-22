@@ -24,7 +24,10 @@ public class ProdutoController {
     private final ProductService productService;
 
     @PostMapping
-    public ResponseEntity<ProductDto> creatProduto(@RequestBody ProductDto request, @AuthenticationPrincipal Usuario usuario){
+    public ResponseEntity<ProductDto> creatProduto(
+            @RequestBody ProductDto request,
+            @AuthenticationPrincipal Usuario usuario
+    ){
 
         Produto produto = productService.create(request, usuario);
         ProductDto response = new ProductDto(produto);
