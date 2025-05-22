@@ -5,6 +5,7 @@ import com.arthur.api.domain.Insumo;
 import com.arthur.api.domain.Produto;
 import com.arthur.api.domain.Usuario;
 import com.arthur.api.dto.AdicionarInsumoDto;
+import com.arthur.api.dto.ComponenteProdutoDto;
 import com.arthur.api.dto.ProductDto;
 import com.arthur.api.repository.ProdutoRepository;
 import lombok.RequiredArgsConstructor;
@@ -58,12 +59,12 @@ public class ProductService {
         return produtoRepository.save(produto);
     }
 
-    public void relacionarIngredientes(Long id, AdicionarInsumoDto adicionarIngredienteDto) {
+    public void relacionarInsumos(Long id, AdicionarInsumoDto adicionarInsumoDto) {
         Produto produto = findById(id);
-        Insumo insumo = insumoService.findById(adicionarIngredienteDto.getInsumoId());
+        Insumo insumo = insumoService.findById(adicionarInsumoDto.getInsumoId());
 
         ComponenteProduto componenteProduto = new ComponenteProduto();
-        componenteProduto.setQuantidade(adicionarIngredienteDto.getQuantidade());
+        componenteProduto.setQuantidade(adicionarInsumoDto.getQuantidade());
         componenteProduto.setInsumo(insumo);
 
         produto.getComponenteProduto().add(componenteProduto);
@@ -84,7 +85,7 @@ public class ProductService {
     }
 
 
-    public ProductDto calcularPreco(Long id) {
+    public Produto calcularPreco(Long id) {
         Produto produto = findById(id);
         BigDecimal custoTotal = calculaCustoTotal(produto);
         produto.setCustoTotal(custoTotal);
@@ -92,6 +93,33 @@ public class ProductService {
 
 
         produtoRepository.save(produto);
-        return new ProductDto(produto);
+        return produto;
+    }
+
+    public void updateQuantComponente(ComponenteProdutoDto request, Long id) {
+        Produto produto = findById(id);
+        for (ComponenteProduto i : produto.getComponenteProduto()) {
+            if (i.getInsumo().getId().equals(request.getInsumoDto().getId())) {
+                i.setQuantidade(request.getQuantidade());
+                break;
+            }
+        }
+        produto = calcularPreco(produto.getId());
+
+        produtoRepository.save(produto);
+    }
+
+    public void deleteComponente(Long id, ComponenteProdutoDto request) {
+        Produto produto = findById(id);
+        for (ComponenteProduto i : produto.getComponenteProduto()) {
+            if (i.getInsumo().getId().equals(request.getInsumoDto().getId())) {
+                produto.getComponenteProduto().remove(i);
+                break;
+            }
+        }
+
+        produto = calcularPreco(produto.getId());
+
+        produtoRepository.save(produto);
     }
 }

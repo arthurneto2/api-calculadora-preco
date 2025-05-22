@@ -1,9 +1,11 @@
 package com.arthur.api.controller;
 
 
+import com.arthur.api.domain.ComponenteProduto;
 import com.arthur.api.domain.Produto;
 import com.arthur.api.domain.Usuario;
 import com.arthur.api.dto.AdicionarInsumoDto;
+import com.arthur.api.dto.ComponenteProdutoDto;
 import com.arthur.api.dto.ProductDto;
 import com.arthur.api.service.ProductService;
 import lombok.RequiredArgsConstructor;
@@ -48,28 +50,42 @@ public class ProdutoController {
 
     @PutMapping
     public ResponseEntity<ProductDto> updateProduto(@RequestBody ProductDto request){
-
-        Produto produto = productService.update(request);
-        ProductDto response = new ProductDto(produto);
-
+        ProductDto response = new ProductDto(productService.update(request));
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{id}/adicionar-insumos")
+    @PostMapping("/{id}")
     public ResponseEntity<Void> adicionarInsumos(
             @PathVariable Long idProduto,
             @RequestBody AdicionarInsumoDto adicionarInsumoDto
     ) {
-        productService.relacionarIngredientes(idProduto, adicionarInsumoDto);
+        productService.relacionarInsumos(idProduto, adicionarInsumoDto);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
 
-    @GetMapping("/{id}/calcular-preco")
+
+    @GetMapping("/{id}/componente")
     public ResponseEntity<ProductDto> calcularPreco(@PathVariable Long id) {
-        ProductDto response = productService.calcularPreco(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(new ProductDto(productService.calcularPreco(id)));
     }
 
+    @PutMapping("/{id}/componente")
+    public ResponseEntity<Void> updateQuantComponente(
+            @RequestBody ComponenteProdutoDto request,
+            @PathVariable Long id
+    ){
 
+        productService.updateQuantComponente(request, id);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}/componente")
+    public ResponseEntity<Void> deleteProduct(
+            @PathVariable Long id,
+            @RequestBody ComponenteProdutoDto request
+    ){
+        productService.deleteComponente(id, request);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
