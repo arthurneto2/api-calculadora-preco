@@ -12,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +58,9 @@ public class ProdutoService {
         produto.setPrecoVenda(produtoDto.getPrecoVenda());
         produto.setMargemDeLucro(produtoDto.getMargemDeLucro());
 
-        return produtoRepository.save(produto);
+        calcularPreco(produto);
+
+        return produto;
     }
 
     public void relacionarInsumos(Long id, AdicionarInsumoDto adicionarInsumoDto) {
@@ -68,12 +72,12 @@ public class ProdutoService {
         componenteProduto.setInsumo(insumo);
 
         produto.getComponenteProduto().add(componenteProduto);
+
+        calcularPreco(produto);
         produtoRepository.save(produto);
-
-
     }
 
-    public BigDecimal calculaCustoTotal(Produto produto) {
+    private BigDecimal calculaCustoTotal(Produto produto) {
         BigDecimal custoTotal = BigDecimal.ZERO;
         for (ComponenteProduto i : produto.getComponenteProduto()) {
             custoTotal = custoTotal.add(i.getInsumo().getCustoUn().multiply(i.getQuantidade()));
@@ -88,9 +92,16 @@ public class ProdutoService {
     public void calcularPreco(Produto produto) {
         BigDecimal custoTotal = calculaCustoTotal(produto);
         produto.setCustoTotal(custoTotal);
-        produto.setPrecoVenda(produto.getMargemDeLucro().multiply(custoTotal));
 
+        // Calcula a margem de lucro com arredondamento
+        BigDecimal margemLucroPercentual = produto.getMargemDeLucro()
+                .divide(new BigDecimal(100), 2, RoundingMode.HALF_UP); // 2 casas decimais, arredondamento padrão
 
+        BigDecimal precoVenda = BigDecimal.ONE
+                .add(margemLucroPercentual)
+                .multiply(custoTotal);
+
+        produto.setPrecoVenda(precoVenda);
         produtoRepository.save(produto);
     }
 
@@ -114,5 +125,11 @@ public class ProdutoService {
             }
         }
         calcularPreco(produto);
+    }
+
+    public Set<ComponenteProduto> listAllComponente(Long idProduto) {
+        Produto produto = findById(idProduto);
+
+        return produto.getComponenteProduto();
     }
 }

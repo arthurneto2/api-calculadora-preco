@@ -13,6 +13,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,7 +34,7 @@ public class ProdutoController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/listAll")
+    @GetMapping("/list-all")
     public ResponseEntity<List<ProdutoDto>> findAll(){
         return ResponseEntity.ok(produtoService.findAll().stream().map(ProdutoDto::new).toList());
     }
@@ -49,22 +50,27 @@ public class ProdutoController {
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @PutMapping
+    @PutMapping("/update-produto")
     public ResponseEntity<ProdutoDto> updateProduto(@RequestBody ProdutoDto request){
         ProdutoDto response = new ProdutoDto(produtoService.update(request));
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{id}")
+    @PostMapping("/{id}/componente")
     public ResponseEntity<Void> adicionarInsumos(
-            @PathVariable Long idProduto,
+            @PathVariable Long id,
             @RequestBody AdicionarInsumoDto adicionarInsumoDto
     ) {
-        produtoService.relacionarInsumos(idProduto, adicionarInsumoDto);
+        produtoService.relacionarInsumos(id, adicionarInsumoDto);
         return ResponseEntity.status(HttpStatus.ACCEPTED).build();
     }
 
-    @PutMapping("/{id}/componente")
+    @GetMapping("/{id}/list-all/componente")
+    public ResponseEntity<List<ComponenteProdutoDto>> findByIdComponente(@PathVariable Long id){
+        return ResponseEntity.ok(produtoService.listAllComponente(id).stream().map(ComponenteProdutoDto::new).toList());
+    }
+
+    @PutMapping("/{id}/update-componente")
     public ResponseEntity<Void> updateQuantComponente(
             @RequestBody ComponenteProdutoDto request,
             @PathVariable Long id

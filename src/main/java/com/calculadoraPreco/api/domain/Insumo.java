@@ -1,9 +1,6 @@
 package com.calculadoraPreco.api.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -23,9 +20,7 @@ public class Insumo {
 
     private BigDecimal custoUn;
 
+    @ManyToOne
     private Usuario usuario;
-
-
-
 
 }

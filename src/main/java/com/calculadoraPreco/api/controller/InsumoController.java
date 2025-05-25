@@ -2,11 +2,13 @@ package com.calculadoraPreco.api.controller;
 
 
 import com.calculadoraPreco.api.domain.Insumo;
+import com.calculadoraPreco.api.domain.Usuario;
 import com.calculadoraPreco.api.dto.InsumoDto;
 import com.calculadoraPreco.api.service.InsumoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,8 +21,10 @@ public class InsumoController {
     private final InsumoService insumoService;
 
     @PostMapping
-    public ResponseEntity<InsumoDto> createInsumo(@RequestBody InsumoDto request){
-        Insumo insumo = insumoService.create(request);
+    public ResponseEntity<InsumoDto> createInsumo(
+            @RequestBody InsumoDto request,
+            @AuthenticationPrincipal Usuario usuario){
+        Insumo insumo = insumoService.create(request, usuario);
         InsumoDto response = new InsumoDto(insumo);
         return ResponseEntity.ok(response);
     }

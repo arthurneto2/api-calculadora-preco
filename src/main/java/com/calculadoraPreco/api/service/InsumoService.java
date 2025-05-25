@@ -1,6 +1,7 @@
 package com.calculadoraPreco.api.service;
 
 import com.calculadoraPreco.api.domain.Insumo;
+import com.calculadoraPreco.api.domain.Usuario;
 import com.calculadoraPreco.api.dto.InsumoDto;
 import com.calculadoraPreco.api.repository.InsumoRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,11 +16,13 @@ public class InsumoService {
 
     private final InsumoRepository insumoRepository;
 
-    public Insumo create(InsumoDto requestDto){
+    public Insumo create(InsumoDto requestDto, Usuario usuario){
         Insumo novoInsumo = new Insumo();
         novoInsumo.setNome(requestDto.getNome());
         novoInsumo.setUnMedida(requestDto.getUnMedida());
         novoInsumo.setCustoUn(requestDto.getCustoUn());
+        novoInsumo.setUsuario(usuario);
+
 
         return insumoRepository.save(novoInsumo);
     };
