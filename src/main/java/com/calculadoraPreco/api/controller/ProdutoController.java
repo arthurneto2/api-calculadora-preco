@@ -22,11 +22,6 @@ public class ProdutoController {
 
     private final ProdutoService produtoService;
 
-    @GetMapping("/list-produtos-teste/{id}")
-    public ResponseEntity<List<ProdutoDto>> testeFind(@PathVariable Long id){
-        return ResponseEntity.ok(produtoService.Teste(id).stream().map(ProdutoDto::new).toList());
-    }
-
     @PostMapping
     public ResponseEntity<ProdutoDto> creatProduto(
             @RequestBody ProdutoDto request,
@@ -40,8 +35,8 @@ public class ProdutoController {
     }
 
     @GetMapping("/list-all")
-    public ResponseEntity<List<ProdutoDto>> findAll(){
-        return ResponseEntity.ok(produtoService.findAll().stream().map(ProdutoDto::new).toList());
+    public ResponseEntity<List<ProdutoDto>> findAll(@AuthenticationPrincipal Usuario usuario){
+        return ResponseEntity.ok(produtoService.findAll(usuario).stream().map(ProdutoDto::new).toList());
     }
 
     @GetMapping("/{id}")

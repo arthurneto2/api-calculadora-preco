@@ -27,8 +27,8 @@ public class InsumoService {
         return insumoRepository.save(novoInsumo);
     };
 
-    public List<Insumo> findAll(){
-        return insumoRepository.findAll();
+    public List<Insumo> findAll(Usuario usuario){
+        return insumoRepository.findAllByUsuarioId(usuario.getId());
     }
 
     public Insumo findById(Long id){

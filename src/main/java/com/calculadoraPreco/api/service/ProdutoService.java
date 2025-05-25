@@ -25,11 +25,6 @@ public class ProdutoService {
 
     private final InsumoService insumoService;
 
-    public List<Produto> Teste(Long idUsuario){
-        return produtoRepository.findAllByUsuarioId(idUsuario);
-    }
-
-
     public Produto create(ProdutoDto produtoDto, Usuario usuario){
 
         Produto produto = new Produto();
@@ -40,15 +35,13 @@ public class ProdutoService {
         return produtoRepository.save(produto);
     }
 
-
-    public List<Produto> findAll() {
-        return produtoRepository.findAll();
-    }
-
     public Produto findById(Long id) {
         return produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
     }
 
+    public List<Produto> findAll(Usuario usuario){
+        return produtoRepository.findAllByUsuarioId(usuario.getId());
+    }
 
     public void delete(Long id) {
         produtoRepository.deleteById(id);

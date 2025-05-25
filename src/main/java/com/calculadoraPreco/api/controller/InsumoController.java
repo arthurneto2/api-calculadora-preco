@@ -30,8 +30,8 @@ public class InsumoController {
     }
 
     @GetMapping("/listAll")
-    public ResponseEntity<List<InsumoDto>> listAll(){
-        return ResponseEntity.ok(insumoService.findAll().stream().map(InsumoDto::new).toList());
+    public ResponseEntity<List<InsumoDto>> listAll(@AuthenticationPrincipal Usuario usuario){
+        return ResponseEntity.ok(insumoService.findAll(usuario).stream().map(InsumoDto::new).toList());
     }
 
     @GetMapping("/{id}")
