@@ -25,6 +25,10 @@ public class ProdutoService {
 
     private final InsumoService insumoService;
 
+    public List<Produto> Teste(Long idUsuario){
+        return produtoRepository.findAllByUsuarioId(idUsuario);
+    }
+
 
     public Produto create(ProdutoDto produtoDto, Usuario usuario){
 

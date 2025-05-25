@@ -22,6 +22,11 @@ public class ProdutoController {
 
     private final ProdutoService produtoService;
 
+    @GetMapping("/list-produtos-teste/{id}")
+    public ResponseEntity<List<ProdutoDto>> testeFind(@PathVariable Long id){
+        return ResponseEntity.ok(produtoService.Teste(id).stream().map(ProdutoDto::new).toList());
+    }
+
     @PostMapping
     public ResponseEntity<ProdutoDto> creatProduto(
             @RequestBody ProdutoDto request,
