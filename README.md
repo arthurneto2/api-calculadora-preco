@@ -41,6 +41,6 @@ API desenvolvida para calcular o custo total e preço de venda de produtos perso
     ```bash
     docker-compose -f src/main/resources/docker-compose.yml up -d
     Execute a aplicação Spring Boot:
-3.Execute a aplicação Spring Boot:
+3.**Execute a aplicação Spring Boot**:
   ```bash
     mvn spring-boot:run
