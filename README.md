@@ -37,10 +37,10 @@ API desenvolvida para calcular o custo total e preço de venda de produtos perso
    ```bash
    git clone https://github.com/arthurneto2/api-calculadora-preco.git
    cd api-calculadora-preco
-2. **Suba os containers (PostgreSQL + API)**:
+2. **Suba os containers (PostgreSQL)**:
     ```bash
-    docker-compose -f src/main/resources/docker-compose.yml up -d
-    Execute a aplicação Spring Boot:
+    cd src/main/resources/
+    docker-compose up -d
 3.**Execute a aplicação Spring Boot**:
   ```bash
     mvn spring-boot:run
