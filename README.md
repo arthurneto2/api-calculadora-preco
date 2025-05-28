@@ -20,4 +20,4 @@ API desenvolvida para calcular o custo total e preço de venda de produtos perso
 - **Segurança**:  
   ![JWT](https://img.shields.io/badge/JWT-Auth0-%23000000?logo=jsonwebtokens)  
 - **Banco de Dados**:  
-  ![SQL](https://img.shields.io/badge/SQL-H2/PostgreSQL-%234479A1?logo=postgresql)  
+  ![SQL](https://img.shields.io/badge/SQL/PostgreSQL-%234479A1?logo=postgresql)  
