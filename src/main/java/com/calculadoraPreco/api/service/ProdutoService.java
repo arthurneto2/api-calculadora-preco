@@ -8,6 +8,7 @@ import com.calculadoraPreco.api.dto.AdicionarInsumoDto;
 import com.calculadoraPreco.api.dto.ComponenteProdutoDto;
 import com.calculadoraPreco.api.dto.ProdutoDto;
 import com.calculadoraPreco.api.repository.ProdutoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +28,13 @@ public class ProdutoService {
 
     public Produto create(ProdutoDto produtoDto, Usuario usuario){
 
+        if (produtoDto.getNome() == null || produtoDto.getNome().trim().isEmpty()) {
+            throw new IllegalArgumentException("O nome do produto é obrigatório.");
+        }
+        if (produtoDto.getMargemDeLucro() == null) {
+            throw new IllegalArgumentException("A margem de lucro é obrigatória.");
+        }
+
         Produto produto = new Produto();
         produto.setNome(produtoDto.getNome());
         produto.setMargemDeLucro(produtoDto.getMargemDeLucro());
@@ -44,8 +52,13 @@ public class ProdutoService {
     }
 
     public void delete(Long id) {
+        if (!produtoRepository.existsById(id)) {
+            throw new EntityNotFoundException("Produto com ID " + id + " não encontrado.");
+        }
+
         produtoRepository.deleteById(id);
     }
+
 
     public Produto update(ProdutoDto produtoDto) {
 
@@ -76,12 +89,15 @@ public class ProdutoService {
 
     private BigDecimal calculaCustoTotal(Produto produto) {
         BigDecimal custoTotal = BigDecimal.ZERO;
-        for (ComponenteProduto i : produto.getComponenteProduto()) {
-            custoTotal = custoTotal.add(i.getInsumo().getCustoUn().multiply(i.getQuantidade()));
-            if (custoTotal.compareTo(BigDecimal.ZERO) < 0) {
-                custoTotal = BigDecimal.ZERO;
+        if (!(produto.getComponenteProduto() == null || produto.getComponenteProduto().isEmpty())){
+            for (ComponenteProduto i : produto.getComponenteProduto()) {
+                custoTotal = custoTotal.add(i.getInsumo().getCustoUn().multiply(i.getQuantidade()));
+                if (custoTotal.compareTo(BigDecimal.ZERO) < 0) {
+                    custoTotal = BigDecimal.ZERO;
+                }
             }
         }
+
         return custoTotal;
     }
 
