@@ -13,7 +13,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,7 +22,7 @@ public class ProdutoController {
     private final ProdutoService produtoService;
 
     @PostMapping
-    public ResponseEntity<ProdutoDto> creatProduto(
+    public ResponseEntity<ProdutoDto> createProduto(
             @RequestBody ProdutoDto request,
             @AuthenticationPrincipal Usuario usuario
     ){
