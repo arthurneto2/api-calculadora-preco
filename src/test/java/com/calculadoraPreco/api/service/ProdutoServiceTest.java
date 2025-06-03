@@ -7,6 +7,7 @@ import com.calculadoraPreco.api.domain.Usuario;
 import com.calculadoraPreco.api.dto.ProdutoDto;
 import com.calculadoraPreco.api.repository.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -32,16 +33,21 @@ class ProdutoServiceTest {
     @InjectMocks
     private ProdutoService produtoService;
 
+    private static Usuario usuario;
 
-    @Test
-    void create_DeveSalvarProdutoComSucesso() {
-        // Arrange
-        Usuario usuario = new Usuario();
+    @BeforeAll
+    static void setUp(){
+        usuario = new Usuario();
         usuario.setId(1L);
         usuario.setName("Arthur");
         usuario.setEmail("<EMAIL>");
         usuario.setPassword("<PASSWORD>");
+    }
 
+
+    @Test
+    void create_DeveSalvarProdutoComSucesso() {
+        // Arrange
         ProdutoDto produtoDto = new ProdutoDto();
         produtoDto.setNome("Notebook");
         produtoDto.setMargemDeLucro(BigDecimal.valueOf(30));
@@ -69,7 +75,6 @@ class ProdutoServiceTest {
     @Test
     void create_DeveLancarExcecaoQuandoDadosInvalidos() {
         // Arrange
-        Usuario usuario = new Usuario();
         ProdutoDto produtoDto = new ProdutoDto(); // Sem nome e margem
 
         // Act & Assert
