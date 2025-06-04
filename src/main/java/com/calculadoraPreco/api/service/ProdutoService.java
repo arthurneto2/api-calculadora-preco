@@ -29,10 +29,10 @@ public class ProdutoService {
     public Produto create(ProdutoDto produtoDto, Usuario usuario){
 
         if (produtoDto.getNome() == null || produtoDto.getNome().trim().isEmpty()) {
-            throw new IllegalArgumentException("O nome do produto é obrigatório.");
+            produtoDto.setNome("nome");
         }
         if (produtoDto.getMargemDeLucro() == null) {
-            throw new IllegalArgumentException("A margem de lucro é obrigatória.");
+            produtoDto.setMargemDeLucro(BigDecimal.ZERO);
         }
 
         Produto produto = new Produto();
@@ -64,8 +64,6 @@ public class ProdutoService {
 
         Produto produto = findById(produtoDto.getId());
         produto.setNome(produtoDto.getNome());
-        produto.setCustoTotal(produtoDto.getCustoTotal());
-        produto.setPrecoVenda(produtoDto.getPrecoVenda());
         produto.setMargemDeLucro(produtoDto.getMargemDeLucro());
 
         calcularPreco(produto);

@@ -8,6 +8,7 @@ import com.calculadoraPreco.api.dto.ProdutoDto;
 import com.calculadoraPreco.api.repository.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -34,9 +35,15 @@ class ProdutoServiceTest {
     private ProdutoService produtoService;
 
     private static Usuario usuario;
+    private ProdutoDto produtoDto;
+    private Produto produtoSalvo;
+    private  Insumo insumo;
+    private  ComponenteProduto componenteProduto;
+    private Set<ComponenteProduto> componentes;
+
 
     @BeforeAll
-    static void setUp(){
+    static void setUpAll(){
         usuario = new Usuario();
         usuario.setId(1L);
         usuario.setName("Arthur");
@@ -44,20 +51,35 @@ class ProdutoServiceTest {
         usuario.setPassword("<PASSWORD>");
     }
 
-
-    @Test
-    void create_DeveSalvarProdutoComSucesso() {
-        // Arrange
-        ProdutoDto produtoDto = new ProdutoDto();
+    @BeforeEach
+    void setUpEach(){
+        //Arrange
+        produtoDto = new ProdutoDto();
         produtoDto.setNome("Notebook");
         produtoDto.setMargemDeLucro(BigDecimal.valueOf(30));
 
-        Produto produtoSalvo = new Produto();
+        produtoSalvo = new Produto();
         produtoSalvo.setId(1L);
         produtoSalvo.setNome("Notebook");
         produtoSalvo.setMargemDeLucro(BigDecimal.valueOf(30));
         produtoSalvo.setUsuario(usuario);
 
+        insumo = new Insumo();
+        insumo.setId(1L);
+        insumo.setNome("CPU");
+        insumo.setUnMedida("Unidade");
+
+        componenteProduto = new ComponenteProduto();
+        componenteProduto.setId(1L);
+        componenteProduto.setQuantidade(BigDecimal.valueOf(1));
+
+        componentes = new HashSet<>();
+
+    }
+
+
+    @Test
+    void create_DeveSalvarProdutoComSucesso() {
         when(produtoRepository.save(any(Produto.class))).thenReturn(produtoSalvo);
 
         // Act
@@ -73,25 +95,38 @@ class ProdutoServiceTest {
     }
 
     @Test
-    void create_DeveLancarExcecaoQuandoDadosInvalidos() {
+    void create_DeveSalvarProdutoComValorPadraoCasoCamposEstejamVazios() {
         // Arrange
-        ProdutoDto produtoDto = new ProdutoDto(); // Sem nome e margem
+        // Sem nome e margem
+        produtoDto.setNome(null);
+        produtoDto.setMargemDeLucro(null);
 
-        // Act & Assert
-        assertThrows(IllegalArgumentException.class, () -> {
-            produtoService.create(produtoDto, usuario);
-        });
+        produtoSalvo.setId(1L);
+        produtoSalvo.setNome("nome");
+        produtoSalvo.setMargemDeLucro(BigDecimal.ZERO);
+
+        // Act
+
+        when(produtoRepository.save(any(Produto.class))).thenReturn(produtoSalvo);
+
+        Produto resultado = produtoService.create(produtoDto, usuario);
+
+        // Assert
+        assertNotNull(resultado);
+        assertEquals(1L, resultado.getId());
+        assertEquals("nome", resultado.getNome());
+        assertEquals(BigDecimal.ZERO, resultado.getMargemDeLucro());
+        assertEquals(usuario, resultado.getUsuario());
+        verify(produtoRepository, times(1)).save(any(Produto.class));
     }
 
     @Test
     void findById_DeveRetornarProdutoQuandoExistir() {
         // Arrange
         Long id = 1L;
-        Produto produto = new Produto();
-        produto.setId(id);
-        produto.setNome("Notebook");
 
-        when(produtoRepository.findById(id)).thenReturn(Optional.of(produto));
+
+        when(produtoRepository.findById(id)).thenReturn(Optional.of(produtoSalvo));
 
         // Act
         Produto resultado = produtoService.findById(id);
@@ -100,6 +135,7 @@ class ProdutoServiceTest {
         assertNotNull(resultado);
         assertEquals(id, resultado.getId());
         assertEquals("Notebook", resultado.getNome());
+        verify(produtoRepository, times(1)).findById(any(Long.class));
     }
 
     @Test
@@ -147,19 +183,13 @@ class ProdutoServiceTest {
     @Test
     void update_DeveAtualizarProdutoComSucessoComListaDeCompoenetesVazia() {
         // Arrange
-        ProdutoDto produtoDto = new ProdutoDto();
         produtoDto.setId(1L);
         produtoDto.setNome("Notebook Atualizado");
         produtoDto.setCustoTotal(BigDecimal.valueOf(0));
         produtoDto.setPrecoVenda(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
         produtoDto.setMargemDeLucro(BigDecimal.valueOf(25));
 
-        Produto produtoExistente = new Produto();
-        produtoExistente.setId(1L);
-        produtoExistente.setNome("Notebook");
-        produtoExistente.setMargemDeLucro(BigDecimal.valueOf(30));
-
-        when(produtoRepository.findById(produtoDto.getId())).thenReturn(Optional.of(produtoExistente));
+        when(produtoRepository.findById(produtoDto.getId())).thenReturn(Optional.of(produtoSalvo));
         when(produtoRepository.save(any(Produto.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
@@ -176,43 +206,21 @@ class ProdutoServiceTest {
         verify(produtoRepository, times(1)).save(any(Produto.class));
     }
 
-    private static Produto getProduto(BigDecimal custoUn) {
-        Insumo insumo = new Insumo();
-        insumo.setId(1L);
-        insumo.setNome("CPU");
-        insumo.setUnMedida("Unidade");
-        insumo.setCustoUn(custoUn);
-
-        ComponenteProduto componenteProduto = new ComponenteProduto();
-        componenteProduto.setId(1L);
-        componenteProduto.setQuantidade(BigDecimal.valueOf(1));
-        componenteProduto.setInsumo(insumo);
-
-        Set<ComponenteProduto> componentes = new HashSet<>();
-        componentes.add(componenteProduto);
-
-        Produto produtoExistente = new Produto();
-        produtoExistente.setId(1L);
-        produtoExistente.setNome("Notebook");
-        produtoExistente.setComponenteProduto(componentes);
-        produtoExistente.setMargemDeLucro(BigDecimal.valueOf(100));
-        return produtoExistente;
-    }
 
     @Test
     void update_DeveAtualizarProdutoComSucessoComListaDeCompoenetesPovoadaComCustoTotalMaiorQueZero() {
         // Arrange
-        ProdutoDto produtoDto = new ProdutoDto();
+
         produtoDto.setId(1L);
         produtoDto.setNome("Notebook Atualizado");
-        produtoDto.setCustoTotal(BigDecimal.valueOf(100));
-        produtoDto.setPrecoVenda(new BigDecimal(200).setScale(2, RoundingMode.HALF_UP));
         produtoDto.setMargemDeLucro(BigDecimal.valueOf(100));
 
-        Produto produtoExistente = getProduto(BigDecimal.valueOf(100));
+        insumo.setCustoUn(BigDecimal.valueOf(100));
+        componenteProduto.setInsumo(insumo);
+        componentes.add(componenteProduto);
+        produtoSalvo.setComponenteProduto(componentes);
 
-
-        when(produtoRepository.findById(produtoDto.getId())).thenReturn(Optional.of(produtoExistente));
+        when(produtoRepository.findById(produtoDto.getId())).thenReturn(Optional.of(produtoSalvo));
         when(produtoRepository.save(any(Produto.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
@@ -222,8 +230,8 @@ class ProdutoServiceTest {
         assertNotNull(resultado);
         assertEquals(produtoDto.getId(), resultado.getId());
         assertEquals(produtoDto.getNome(), resultado.getNome());
-        assertEquals(produtoDto.getCustoTotal(), resultado.getCustoTotal());
-        assertEquals(produtoDto.getPrecoVenda(), resultado.getPrecoVenda());
+        assertEquals(BigDecimal.valueOf(100), resultado.getCustoTotal());
+        assertEquals(new BigDecimal(200).setScale(2, RoundingMode.HALF_UP), resultado.getPrecoVenda());
         assertEquals(produtoDto.getMargemDeLucro(), resultado.getMargemDeLucro());
         verify(produtoRepository, times(1)).findById(produtoDto.getId());
         verify(produtoRepository, times(1)).save(any(Produto.class));
@@ -232,17 +240,17 @@ class ProdutoServiceTest {
     @Test
     void update_DeveAtualizarProdutoComSucessoComListaDeCompoenetesPovoadaComCustoTotalMenorQueZero() {
         // Arrange
-        ProdutoDto produtoDto = new ProdutoDto();
+
         produtoDto.setId(1L);
         produtoDto.setNome("Notebook Atualizado");
-        produtoDto.setCustoTotal(BigDecimal.valueOf(0));
-        produtoDto.setPrecoVenda(new BigDecimal(0).setScale(2, RoundingMode.HALF_UP));
         produtoDto.setMargemDeLucro(BigDecimal.valueOf(100));
 
-        Produto produtoExistente = getProduto(BigDecimal.valueOf(-100));
+        insumo.setCustoUn(BigDecimal.valueOf(-100));
+        componenteProduto.setInsumo(insumo);
+        componentes.add(componenteProduto);
+        produtoSalvo.setComponenteProduto(componentes);
 
-
-        when(produtoRepository.findById(produtoDto.getId())).thenReturn(Optional.of(produtoExistente));
+        when(produtoRepository.findById(produtoDto.getId())).thenReturn(Optional.of(produtoSalvo));
         when(produtoRepository.save(any(Produto.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
@@ -252,8 +260,8 @@ class ProdutoServiceTest {
         assertNotNull(resultado);
         assertEquals(produtoDto.getId(), resultado.getId());
         assertEquals(produtoDto.getNome(), resultado.getNome());
-        assertEquals(produtoDto.getCustoTotal(), resultado.getCustoTotal());
-        assertEquals(produtoDto.getPrecoVenda(), resultado.getPrecoVenda());
+        assertEquals(BigDecimal.ZERO, resultado.getCustoTotal());
+        assertEquals(new BigDecimal(0).setScale(2, RoundingMode.HALF_UP), resultado.getPrecoVenda());
         assertEquals(produtoDto.getMargemDeLucro(), resultado.getMargemDeLucro());
         verify(produtoRepository, times(1)).findById(produtoDto.getId());
         verify(produtoRepository, times(1)).save(any(Produto.class));
@@ -263,7 +271,6 @@ class ProdutoServiceTest {
     @Test
     void update_DeveLancarExcecaoQuandoProdutoNaoExistir() {
         // Arrange
-        ProdutoDto produtoDto = new ProdutoDto();
         produtoDto.setId(999L);
 
         when(produtoRepository.findById(produtoDto.getId())).thenReturn(Optional.empty());
