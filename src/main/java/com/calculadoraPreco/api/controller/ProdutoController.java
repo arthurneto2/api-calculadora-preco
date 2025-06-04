@@ -1,6 +1,5 @@
 package com.calculadoraPreco.api.controller;
 
-import com.calculadoraPreco.api.domain.Produto;
 import com.calculadoraPreco.api.domain.Usuario;
 import com.calculadoraPreco.api.dto.AdicionarInsumoDto;
 import com.calculadoraPreco.api.dto.ComponenteProdutoDto;
@@ -27,14 +26,16 @@ public class ProdutoController {
             @AuthenticationPrincipal Usuario usuario
     ){
 
-        Produto produto = produtoService.create(request, usuario);
-        ProdutoDto response = new ProdutoDto(produto);
+        ProdutoDto response = new ProdutoDto(produtoService.create(request, usuario));
 
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/list-all")
     public ResponseEntity<List<ProdutoDto>> findAll(@AuthenticationPrincipal Usuario usuario){
+        if (usuario == null) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
         return ResponseEntity.ok(produtoService.findAll(usuario).stream().map(ProdutoDto::new).toList());
     }
 

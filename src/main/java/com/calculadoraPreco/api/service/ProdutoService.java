@@ -10,7 +10,9 @@ import com.calculadoraPreco.api.dto.ProdutoDto;
 import com.calculadoraPreco.api.repository.ProdutoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -44,7 +46,8 @@ public class ProdutoService {
     }
 
     public Produto findById(Long id) {
-        return produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado!"));
+        return produtoRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Produto não encontrado!"));
     }
 
     public List<Produto> findAll(Usuario usuario){
