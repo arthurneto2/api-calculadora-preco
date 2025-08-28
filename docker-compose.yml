@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: meu_banco
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db_labprog
+    networks:
+      - back-net
+
+  api:
+    build:
+      context: .
+    container_name: backendcalc
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://meu_banco:5432/db_labprog
+      SPRING_DATASOURCE_USERNAME: admin
+      SPRING_DATASOURCE_PASSWORD: password
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    networks:
+      - front-net
+      - back-net
+
+networks:
+  front-net:
+    name: front-net
+    driver: bridge
+  back-net:
+    name: back-net
+    driver: bridge
